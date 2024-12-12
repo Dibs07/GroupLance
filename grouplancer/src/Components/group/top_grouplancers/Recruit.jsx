@@ -16,47 +16,49 @@ import { useUser } from "../../../context/UserContext";
 import StarIcon from '@mui/icons-material/Star';
 import toast from "react-hot-toast";
 
-const Recruit = ({ id, name, email, rate, profilePic, color, groups,skills }) => {
+const Recruit = ({ id, name, email, rate, profilePic, color, groups, skills }) => {
   // console.log(groups)
   const [myGroups, setMyGroups] = useState([]);
   const navigate = useNavigate()
   const { currentUser } = useUser();
   const [profileopen, setprofileOpen] = useState(false)
+  const [memberId, setMemberId] = useState("")
+  const [invitedGroup, setInvitedGroup] = useState("")
 
   const handleProfileClose = () => setprofileOpen(false)
   const handleProfileOpen = () => setprofileOpen(true)
 
-  const inviteMember = async (id, gDesc) => {
-      try {
-          const authToken = localStorage.getItem("auth-token");
-          const response = await fetch(
-              "http://localhost:8080/api/group/invite-members",
-              {
-                  method: "POST",
-                  headers: {
-                      "Content-Type": "application/json",
-                      "auth-token": authToken,
-                  },
-                  body: JSON.stringify({
-                      invitedUserMail: email,
-                      invitationLink: "http://localhost:3000/notify",
-                      group: {
-                          id: id,
-                          name: selectedGroup,
-                          desc: gDesc,
-                      },
-                      inviterName: currentUser.name,
-                  }),
-              }
-          );
-          const data = await response.json();
-        
-          console.log(data)
-          toast.success("Invitation Sent")
-      } catch (error) {
-          console.error(error);
-          toast.error("Error !")
-      }
+  const inviteMember = async (id, gDesc,gName) => {
+    try {
+      const authToken = localStorage.getItem("auth-token");
+      const response = await fetch(
+        "http://localhost:8080/api/group/invite-members",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": authToken,
+          },
+          body: JSON.stringify({
+            invitedUserMail: email,
+            invitationLink: "http://localhost:3000/notify",
+            group: {
+              id: id,
+              name: gName,
+              desc: gDesc,
+            },
+            inviterName: currentUser.name,
+          }),
+        }
+      );
+      const data = await response.json();
+
+      console.log(data)
+      toast.success("Invitation Sent")
+    } catch (error) {
+      console.error(error);
+      toast.error("Error !")
+    }
   };
 
   const [open, setOpen] = React.useState(false);
@@ -121,18 +123,18 @@ const Recruit = ({ id, name, email, rate, profilePic, color, groups,skills }) =>
 
           <ListGroup className="list-group-flush" style={{ borderRadius: "0.5rem", boxShadow: "5px 2px 3px 2px #59788e" }}>
             <ListGroup.Item>Name:  {name}</ListGroup.Item>
-            <ListGroup.Item>Rate: {rate} <StarIcon style={{color: "#ffde38"}} /></ListGroup.Item>
+            <ListGroup.Item style={{display:"flex"}}>Rate: {rate} {rate != null ? <StarIcon style={{ color: "#ffde38" }} /> : <p> Not Rated</p>}</ListGroup.Item>
           </ListGroup>
           <Card.Body style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-            {currentUser._id !==id? 
-             <Button onClick={handleOpen} style={{ backgroundColor: "#000066", color: "white", width: "10vw", height: "5vh", display: "block", margin: "0 auto" }} variant="contained" endIcon={<SendIcon />} >
-              Invite
-            </Button> : null}
-          
-            <button type="button" class="btn btn-primary" onClick={handleProfileOpen}  style={{ backgroundColor: "#000066", color: "white", width: "10vw", height: "5vh", display: "block", margin: "0 auto" }}>
+            {currentUser._id !== id ?
+              <Button onClick={handleOpen} style={{ backgroundColor: "#000066", color: "white", width: "10vw", height: "5vh", display: "block", margin: "0 auto" }} variant="contained" endIcon={<SendIcon />} >
+                Invite
+              </Button> : null}
+
+            <button type="button" class="btn btn-primary" onClick={handleProfileOpen} style={{ backgroundColor: "#000066", color: "white", width: "10vw", height: "5vh", display: "block", margin: "0 auto" }}>
               View Profile
             </button>
-           
+
           </Card.Body>
         </div>
 
@@ -153,49 +155,49 @@ const Recruit = ({ id, name, email, rate, profilePic, color, groups,skills }) =>
               </div>
             </div> */}
 
-<Modal
-          open={profileopen}
-          onClose={handleProfileClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
+      <Modal
+        open={profileopen}
+        onClose={handleProfileClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
 
-        >
-          <Box sx={style} style={{ }}>
-            <Typography id="modal-modal-title" variant="h4" component="h2">
-              
-            </Typography>
-            <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }}>
-             <span>Name:</span> {name}
-            </Typography>
-            <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }}>
-             <span>Email:</span> {email}
-            </Typography>
-            <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }}>
-                <span>Skills:</span> 
-               </Typography>
-               
-            {skills.length? skills.map((skill)=>{
-              return(
-                <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }} style={{backgroundColor:"#1F456C", padding:"1rem", borderRadius:"1rem"}}>
+      >
+        <Box sx={style} style={{}}>
+          <Typography id="modal-modal-title" variant="h4" component="h2">
+
+          </Typography>
+          <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }}>
+            <span>Name:</span> {name}
+          </Typography>
+          <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }}>
+            <span>Email:</span> {email}
+          </Typography>
+          <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }}>
+            <span>Skills:</span>
+          </Typography>
+
+          {skills.length ? skills.map((skill) => {
+            return (
+              <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }} style={{ backgroundColor: "#1F456C", padding: "1rem", borderRadius: "1rem" }}>
                 {skill}
-               </Typography>
-              )
-             
-            }):  
+              </Typography>
+            )
+
+          }) :
             <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }}>
-            No skills
-           </Typography>}
-            {/* 
+              No skills
+            </Typography>}
+          {/* 
             
              <Typography id="modal-modal-description" variant="h6" sx={{ mt: 2 }}>
               <span style={{textDecoration:"underline"}}>Group Description</span> : {description}
             </Typography> */}
-            <Button variant="contained" onClick={handleProfileClose} style={{marginTop:"2rem", backgroundColor:"#05023b", color:"white"}}>
-              Close
-            </Button>
-          </Box>
-        
-        </Modal>
+          <Button variant="contained" onClick={handleProfileClose} style={{ marginTop: "2rem", backgroundColor: "#05023b", color: "white" }}>
+            Close
+          </Button>
+        </Box>
+
+      </Modal>
       <Modal
         open={open}
         onClose={handleClose}
@@ -204,50 +206,41 @@ const Recruit = ({ id, name, email, rate, profilePic, color, groups,skills }) =>
       >
         <Box sx={style}>
           <List dense sx={{ width: '100%', maxWidth: 360 }}>
-            {Object.keys(myGroups).length?
-             <Typography id="modal-modal-title" variant="h4" component="h2" style={{ display: "flex", justifyContent: "center" }}>
-             Invite
-             </Typography>:
-               <Typography id="modal-modal-title" variant="h6" component="h2" style={{ display: "flex", justifyContent: "center" }}>
-               You don't have any group
-               </Typography>
+            {Object.keys(myGroups).length ?
+              <Typography id="modal-modal-title" variant="h4" component="h2" style={{ display: "flex", justifyContent: "center" }}>
+                Invite
+              </Typography> :
+              <Typography id="modal-modal-title" variant="h6" component="h2" style={{ display: "flex", justifyContent: "center" }}>
+                You don't have any group
+              </Typography>
             }
-           
+
             {myGroups &&
               myGroups.map(({ gName, _id, gDesc }) => {
                 const labelId = `checkbox-list-secondary-label-${gName}`
                 return (
                   <>
+                    <div style={{ display: "flex" }}>
+                      <ListItem style={{ display: "flex", flexDirection: "row", marginRight: "2px", paddingRight: "2px" }}
+                        key={gName}
+                      >
 
-                    <ListItem
-                      key={gName}
-                      secondaryAction={
-                        <Checkbox
-                          edge="end"
-                          onChange={handleToggle(gName)}
-                          checked={gName === selectedGroup}
-                          inputProps={{ 'aria-labelledby': labelId }}
-                          style={{ color: '#000' }}
-                        />
-                      }
-                      disablePadding
-                    >
-                      <ListItemButton>
-                        <Typography variant="body1" style={{ fontSize: '1.2rem', marginTop: "1rem" }}>
+                        <Typography variant="body1" style={{ fontSize: '1.2rem', marginTop: "1rem", marginRight: "3px", paddingRight: "2px" }}>
                           {gName}
                         </Typography>
-                      </ListItemButton>
-                    </ListItem>
-                    <Button
-                      variant="contained"
-                      onClick={() => {
-                        handleClose();
-                        inviteMember(_id, gDesc)
-                      }}
-                      style={{ marginTop: '2rem', backgroundColor: '#05023b', color: '#ffff' }}
-                    >
-                      Invite
-                    </Button>
+
+                      </ListItem>
+                      <Button
+                        variant="contained"
+                        onClick={() => {
+                          handleClose();
+                          inviteMember(_id, gDesc,gName)
+                        }}
+                        style={{ marginTop: '2rem', backgroundColor: '#05023b', color: '#ffff' }}
+                      >
+                        Invite
+                      </Button>
+                    </div>
                   </>
                 );
               })}
